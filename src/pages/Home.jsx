@@ -1,0 +1,88 @@
+import { useState, useEffect, useRef } from "react";
+import SearchBar from "../components/SearchBar";
+import ProductCard from "../components/ProductCard";
+import Pagination from "../components/Pagination";
+import { fetchProducts } from "../services/searchAPI";
+
+export default function Home() {
+  const [query, setQuery] = useState("");
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const topRef = useRef(null);
+
+  // Handle search input
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery);
+    setCurrentPage(1);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Fetch products from API
+  const getProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchProducts(query, currentPage);
+      setProducts(data.results);
+      setTotalPages(data.pagination.totalPages || 1);
+      setError("");
+      // Scroll to top smoothly
+      topRef?.current?.scrollIntoView({ behavior: "smooth" });
+    } catch (err) {
+      setError("Oops, something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch products when query or page changes
+  useEffect(() => {
+    getProducts();
+  }, [query, currentPage]);
+
+  return (
+    <div
+      className='p-4 max-w-6xl  mx-auto flex flex-col items-center'
+      ref={topRef}
+    >
+
+
+      <div className="z-1">
+        <SearchBar onSearch={handleSearch} />
+      </div>
+
+      {error && <p className='text-red-500 text-center mt-2'>{error}</p>}
+      {loading ? (
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 w-full'>
+          {[...Array(24)].map((_, index) => (
+            <div key={index} className='animate-pulse'>
+              <div className='bg-gray-400 h-64 rounded-lg'></div>
+              <div className='mt-2 h-6 bg-gray-400 rounded w-3/4'></div>
+              <div className='mt-1 h-4 bg-gray-400 rounded w-1/2'></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4'>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+
+      {products.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
+    </div>
+  );
+}
