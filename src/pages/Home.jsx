@@ -13,18 +13,18 @@ export default function Home() {
   const [error, setError] = useState("");
   const topRef = useRef(null);
 
-  // Handle search input
+  // handle search input
   const handleSearch = (newQuery) => {
     setQuery(newQuery);
     setCurrentPage(1);
   };
 
-  // Handle pagination
+  // handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // Fetch products from API
+  // fetch products from API
   const getProducts = async () => {
     try {
       setLoading(true);
@@ -32,7 +32,7 @@ export default function Home() {
       setProducts(data.results);
       setTotalPages(data.pagination.totalPages || 1);
       setError("");
-      // Scroll to top smoothly
+      // scroll to top smoothly
       topRef?.current?.scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       setError("Oops, something went wrong!");
@@ -41,7 +41,7 @@ export default function Home() {
     }
   };
 
-  // Fetch products when query or page changes
+  // fetch products when query or page changes
   useEffect(() => {
     getProducts();
   }, [query, currentPage]);
