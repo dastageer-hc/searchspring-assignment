@@ -48,25 +48,19 @@ export default function Home() {
 
   return (
     <div
-      className='p-4  mx-auto flex flex-col items-center'
+      className='p-4 mx-auto flex flex-col items-center w-full max-w-[100vw] overflow-x-hidden'
       ref={topRef}
     >
-
-
-
       <div className="z-1 w-full flex items-center justify-center">
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      <div className="max-w-6xl">
-
-
-
+      <div className="max-w-6xl w-full">
         {error && <p className='text-red-500 text-center mt-2'>{error}</p>}
         {loading ? (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 w-full'>
+          <div className='grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4'>
             {[...Array(24)].map((_, index) => (
-              <div key={index} className='animate-pulse'>
+              <div key={index} className='animate-pulse w-full'>
                 <div className='bg-gray-200 h-[30rem] rounded-lg'></div>
                 <div className='mt-2 h-6 bg-gray-200 rounded w-3/4'></div>
                 <div className='mt-1 h-4 bg-gray-200 rounded w-1/2'></div>
@@ -74,7 +68,7 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4'>
+          <div className='grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4'>
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
