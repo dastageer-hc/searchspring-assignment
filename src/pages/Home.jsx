@@ -3,7 +3,7 @@ import SearchBar from "../components/SearchBar";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import { fetchProducts } from "../services/searchAPI";
-import { LuArrowUpDown, LuFilter, LuTags } from "react-icons/lu";
+import { LuArrowUpDown, LuFilter } from "react-icons/lu";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -13,10 +13,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sort, setSort] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
   const [filter, setFilter] = useState("");
-  const [facets, setFacets] = useState([]);
-  const [selectedFacets, setSelectedFacets] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
   const topRef = useRef(null);
 
   const sortOptions = [
@@ -43,63 +41,33 @@ export default function Home() {
     "Sunglasses"
   ];
 
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleSortChange = (e) => {
+    setSort(e.target.value);
+    setCurrentPage(1);
+  };
+
   const handleKeywordClick = (keyword) => {
     setFilter(keyword);
     setShowFilters(false);
     handleSearch(keyword);
   };
 
-  // handle search input
-  const handleSearch = (newQuery) => {
-    setQuery(newQuery);
-    setCurrentPage(1);
-  };
-
-  // handle pagination
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  // handle sort change
-  const handleSortChange = (e) => {
-    setSort(e.target.value);
-    console.log(e.target.value);
-    setCurrentPage(1);
-  };
-
-  // handle filter change
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-    setCurrentPage(1);
-  };
-
-  // handle facet selection
-  const handleFacetChange = (facetField, value) => {
-    setSelectedFacets(prev => {
-      const newFacets = { ...prev };
-      if (newFacets[facetField]?.includes(value)) {
-        newFacets[facetField] = newFacets[facetField].filter(v => v !== value);
-        if (newFacets[facetField].length === 0) {
-          delete newFacets[facetField];
-        }
-      } else {
-        newFacets[facetField] = [...(newFacets[facetField] || []), value];
-      }
-      return newFacets;
-    });
-    setCurrentPage(1);
-  };
-
-  // fetch products from API
   const getProducts = async () => {
     try {
       setLoading(true);
-      const data = await fetchProducts(query, currentPage, sort, filter, selectedFacets);
+      const data = await fetchProducts(query, currentPage, sort, filter);
       setProducts(data.results);
       setTotalPages(data.pagination.totalPages || 1);
-      setFacets(data.facets || []);
       setError("");
-      // scroll to top smoothly
       topRef?.current?.scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       setError("Oops, something went wrong!");
@@ -108,10 +76,9 @@ export default function Home() {
     }
   };
 
-  // fetch products when query, page, sort, filter, or facets change
   useEffect(() => {
     getProducts();
-  }, [query, currentPage, sort, filter, selectedFacets]);
+  }, [query, currentPage, sort, filter]);
 
   return (
     <div
